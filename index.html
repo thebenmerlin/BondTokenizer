@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond Bazaar Pro - Tokenized Bond Trading Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h2>Bond Bazaar Pro</h2>
+                    <span class="beta-tag">Beta</span>
+                </div>
+                <nav class="nav">
+                    <button class="nav-item active" data-view="dashboard">Dashboard</button>
+                    <button class="nav-item" data-view="trading">Trading</button>
+                    <button class="nav-item" data-view="portfolio">Portfolio</button>
+                    <button class="nav-item" data-view="analytics">Analytics</button>
+                    <button class="nav-item" data-view="compliance">Compliance</button>
+                </nav>
+                <div class="header-actions">
+                    <div class="wallet-status">
+                        <span class="wallet-indicator connected"></span>
+                        <span>0x7a8f...9c4d</span>
+                    </div>
+                    <button class="theme-toggle" id="themeToggle">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view active">
+            <div class="container">
+                <!-- Market Overview Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Market Cap</h3>
+                        <div class="stat-value">₹1.25T</div>
+                        <div class="stat-change positive">+2.3%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Daily Volume</h3>
+                        <div class="stat-value">₹45B</div>
+                        <div class="stat-change positive">+8.7%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Tokens</h3>
+                        <div class="stat-value">87</div>
+                        <div class="stat-change positive">+5</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Avg Yield</h3>
+                        <div class="stat-value">7.23%</div>
+                        <div class="stat-change negative">-0.1%</div>
+                    </div>
+                </div>
+
+                <!-- Featured Bonds -->
+                <section class="featured-bonds">
+                    <h2>Featured Bonds</h2>
+                    <div class="bonds-grid" id="featured-bonds"></div>
+                </section>
+
+                <!-- Market Heatmap -->
+                <section class="market-section">
+                    <h2>Market Overview</h2>
+                    <div class="chart-container">
+                        <canvas id="marketChart"></canvas>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Trading View -->
+        <div id="trading-view" class="view">
+            <div class="container trading-container">
+                <div class="trading-layout">
+                    <!-- Bond Selection -->
+                    <div class="trading-sidebar">
+                        <div class="bond-selector">
+                            <h3>Select Bond</h3>
+                            <select id="selectedBond" class="form-control">
+                                <option value="RELI001">RELI001 - Reliance Industries</option>
+                                <option value="HDFC002">HDFC002 - HDFC Bank</option>
+                                <option value="TCS003">TCS003 - Tata Consultancy</option>
+                                <option value="INFY004">INFY004 - Infosys Limited</option>
+                                <option value="BAJF005">BAJF005 - Bajaj Finance</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Order Entry Panel -->
+                        <div class="order-panel">
+                            <h3>Place Order</h3>
+                            <div class="order-tabs">
+                                <button class="order-tab active" data-type="buy">Buy</button>
+                                <button class="order-tab" data-type="sell">Sell</button>
+                            </div>
+                            <div class="order-form">
+                                <div class="form-group">
+                                    <label class="form-label">Order Type</label>
+                                    <select id="orderType" class="form-control">
+                                        <option value="limit">Limit Order</option>
+                                        <option value="market">Market Order</option>
+                                        <option value="stop">Stop Order</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Quantity (Tokens)</label>
+                                    <input type="number" id="orderQuantity" class="form-control" min="1" placeholder="Enter quantity">
+                                </div>
+                                <div class="form-group limit-price">
+                                    <label class="form-label">Price (₹)</label>
+                                    <input type="number" id="orderPrice" class="form-control" step="0.01" placeholder="Enter price">
+                                </div>
+                                <div class="order-summary">
+                                    <div class="summary-row">
+                                        <span>Total Value:</span>
+                                        <span id="orderTotal">₹0.00</span>
+                                    </div>
+                                </div>
+                                <button id="placeOrder" class="btn btn--primary btn--full-width">Place Buy Order</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Book & Chart -->
+                    <div class="trading-main">
+                        <!-- Price Chart -->
+                        <div class="chart-section">
+                            <div class="chart-header">
+                                <h3 id="bondTitle">RELI001 - Reliance Industries Ltd</h3>
+                                <div class="price-info">
+                                    <span class="current-price" id="currentPrice">₹1,032.50</span>
+                                    <span class="price-change positive" id="priceChange">+0.25%</span>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="priceChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Order Book -->
+                        <div class="orderbook-section">
+                            <h3>Order Book</h3>
+                            <div class="orderbook">
+                                <div class="orderbook-side">
+                                    <h4>Asks (Sell Orders)</h4>
+                                    <div class="orderbook-header">
+                                        <span>Price</span>
+                                        <span>Quantity</span>
+                                        <span>Total</span>
+                                    </div>
+                                    <div id="askOrders" class="orderbook-list"></div>
+                                </div>
+                                <div class="spread-indicator">
+                                    <span>Spread: <span id="spread">₹0.50</span></span>
+                                </div>
+                                <div class="orderbook-side">
+                                    <h4>Bids (Buy Orders)</h4>
+                                    <div class="orderbook-header">
+                                        <span>Price</span>
+                                        <span>Quantity</span>
+                                        <span>Total</span>
+                                    </div>
+                                    <div id="bidOrders" class="orderbook-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio View -->
+        <div id="portfolio-view" class="view">
+            <div class="container">
+                <div class="portfolio-header">
+                    <h2>Portfolio Overview</h2>
+                    <div class="portfolio-stats">
+                        <div class="portfolio-stat">
+                            <label>Total Value</label>
+                            <span class="value">₹25,47,500</span>
+                        </div>
+                        <div class="portfolio-stat">
+                            <label>Total Gain/Loss</label>
+                            <span class="value positive">₹1,42,500 (+5.9%)</span>
+                        </div>
+                        <div class="portfolio-stat">
+                            <label>Realized Gain</label>
+                            <span class="value">₹45,000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Allocation Chart -->
+                <div class="portfolio-chart-section">
+                    <h3>Portfolio Allocation</h3>
+                    <div class="chart-container">
+                        <canvas id="portfolioChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Holdings Table -->
+                <div class="holdings-section">
+                    <h3>Current Holdings</h3>
+                    <div class="table-container">
+                        <table class="holdings-table">
+                            <thead>
+                                <tr>
+                                    <th>Bond</th>
+                                    <th>Issuer</th>
+                                    <th>Quantity</th>
+                                    <th>Avg Cost</th>
+                                    <th>Current Price</th>
+                                    <th>Current Value</th>
+                                    <th>Gain/Loss</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="holdingsTable">
+                                <!-- Holdings will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics View -->
+        <div id="analytics-view" class="view">
+            <div class="container">
+                <h2>Market Analytics</h2>
+                
+                <!-- Analytics Dashboard -->
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Liquidity Pools</h3>
+                        <div id="liquidityPools" class="pools-container"></div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Market Trends</h3>
+                        <div class="chart-container">
+                            <canvas id="trendsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Sector Performance</h3>
+                        <div class="chart-container">
+                            <canvas id="sectorChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Risk Metrics</h3>
+                        <div class="risk-metrics">
+                            <div class="metric">
+                                <label>Portfolio VaR (95%)</label>
+                                <span class="value">₹45,000</span>
+                            </div>
+                            <div class="metric">
+                                <label>Beta</label>
+                                <span class="value">0.85</span>
+                            </div>
+                            <div class="metric">
+                                <label>Duration</label>
+                                <span class="value">2.4 years</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compliance View -->
+        <div id="compliance-view" class="view">
+            <div class="container">
+                <h2>Compliance & Risk Management</h2>
+                
+                <div class="compliance-grid">
+                    <!-- KYC Status -->
+                    <div class="compliance-card">
+                        <h3>KYC Status</h3>
+                        <div class="kyc-status">
+                            <div class="status-indicator verified">
+                                <span class="status-dot"></span>
+                                <span>Verified</span>
+                            </div>
+                            <div class="kyc-details">
+                                <p>Last Updated: August 15, 2025</p>
+                                <p>Next Review: February 15, 2026</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AML Risk Assessment -->
+                    <div class="compliance-card">
+                        <h3>AML Risk Assessment</h3>
+                        <div class="risk-assessment">
+                            <div class="risk-score low">
+                                <span class="score">2.4</span>
+                                <span class="risk-level">Low Risk</span>
+                            </div>
+                            <div class="risk-factors">
+                                <div class="factor">
+                                    <span>Geographic Risk</span>
+                                    <span class="level low">Low</span>
+                                </div>
+                                <div class="factor">
+                                    <span>Transaction Pattern</span>
+                                    <span class="level low">Normal</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trading Limits -->
+                    <div class="compliance-card">
+                        <h3>Trading Limits</h3>
+                        <div class="trading-limits">
+                            <div class="limit">
+                                <label>Daily Limit</label>
+                                <div class="limit-bar">
+                                    <div class="limit-used" style="width: 15%"></div>
+                                </div>
+                                <span>₹1.5M / ₹10M</span>
+                            </div>
+                            <div class="limit">
+                                <label>Monthly Limit</label>
+                                <div class="limit-bar">
+                                    <div class="limit-used" style="width: 32%"></div>
+                                </div>
+                                <span>₹80M / ₹250M</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Audit Trail -->
+                    <div class="compliance-card full-width">
+                        <h3>Recent Transactions Audit Trail</h3>
+                        <div class="audit-trail">
+                            <div class="audit-item">
+                                <span class="timestamp">2025-09-04 16:45:23</span>
+                                <span class="action">BUY Order Executed</span>
+                                <span class="details">RELI001 - 500 tokens @ ₹1,032.50</span>
+                                <span class="status verified">Verified</span>
+                            </div>
+                            <div class="audit-item">
+                                <span class="timestamp">2025-09-04 14:22:15</span>
+                                <span class="action">SELL Order Placed</span>
+                                <span class="details">HDFC002 - 250 tokens @ ₹1,020.00</span>
+                                <span class="status pending">Pending</span>
+                            </div>
+                            <div class="audit-item">
+                                <span class="timestamp">2025-09-04 11:30:42</span>
+                                <span class="action">Liquidity Reward</span>
+                                <span class="details">Pool reward: ₹1,250</span>
+                                <span class="status verified">Verified</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Order Confirmation Modal -->
+    <div id="orderModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Confirm Order</h3>
+            <div id="orderConfirmation" class="order-confirmation">
+                <!-- Order details will be populated by JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button id="cancelOrder" class="btn btn--outline">Cancel</button>
+                <button id="confirmOrder" class="btn btn--primary">Confirm Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
